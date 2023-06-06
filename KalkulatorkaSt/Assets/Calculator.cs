@@ -31,78 +31,80 @@ public class Calculator : MonoBehaviour
             elements.Add(input);
         }
 
-
-        foreach (var VARIABLE in elements)
-        {
-            if (VARIABLE.Contains('*') || VARIABLE.Contains('/'))
+        string num = null;
+        List<string> exampleList = new List<string>();
+        float _localResult = 0;
+        
+        for (int j = 0; j < elements.Count; j++)
             {
-                string _num1 = null;
-                string _num2 = null;
-                string _operator = null;
-                float _localResult = 0;
-                List<string> exampleList = new List<string>();
-
-                /*for(int i = 0; i < VARIABLE.Length; i++)
-                    exampleList.Add(VARIABLE[i].ToString());*/
-
-                for (int i = 0; i < VARIABLE.Length; i++)
+                if (elements[j].Contains('*') || elements[j].Contains('/'))
                 {
-                    if (char.IsDigit(VARIABLE[i]))
+                    foreach (var element in elements[j])
                     {
-                        if (_num1 == null)
+                        if (element == '*' || element == '/' )
                         {
-                            _num1 += VARIABLE[i];
-                            exampleList.Add(_num1);
-                        }
-                        else if (_num2 == null)
-                        {
-                            _num2 += VARIABLE[i];
+                            exampleList.Add(num);
+                            exampleList.Add(element.ToString());
+                            num = null;
                         }
                         else
                         {
-                            switch (_operator)
-                            {
-                                case "*":
-                                    _localResult = float.Parse(_num1) * float.Parse(_num2);
-                                    break;
-                                case "/":
-                                    _localResult = float.Parse(_num1) / float.Parse(_num2);
-                                    break;
-                            }
-                            exampleList.Add(_operator);
-                            exampleList.Add(_num2);
-                            
-                            exampleList.RemoveRange(i - 2, 3);
-                            elements.Insert(0, _localResult.ToString());
-                            i -= 2;
+                            num += element.ToString();
                         }
-                        
                     }
-                    else
+                    exampleList.Add(num);
+                
+                    for (int i = 0; i < exampleList.Count; i++)
                     {
-                        _operator = VARIABLE[i].ToString();
-                    }
-                }
+                        float num1;
+                        float num2;
 
-                foreach (var k in exampleList)
-                {
-                    Debug.Log(k);
+                        switch (exampleList[i])
+                        { 
+                            case "*":
+                                num1 = float.Parse(exampleList[i - 1]);
+                                num2 = float.Parse(exampleList[i + 1]);
+                    
+                                _localResult = num1 * num2;
+                                exampleList.RemoveRange(i - 1, 3);
+                                exampleList.Insert(0, _localResult.ToString());
+                
+                                i -= 2;
+                                break;
+                    
+                            case "/":
+                                num1 = float.Parse(exampleList[exampleList.IndexOf(exampleList[i]) - 1]);
+                                num2 = float.Parse(exampleList[exampleList.IndexOf(exampleList[i]) + 1]);
+
+                                _localResult = num1 / num2;
+                                exampleList.RemoveRange(i - 1, 3);
+                                exampleList.Insert(0, _localResult.ToString());
+                                i -= 2;
+                                break;
+                        }
+                    }
+                    
+                    elements[j] = exampleList[0];
                 }
+                
+                //Debug.Log(exampleList[j]);
             }
-        }
-       
-           
-        
+
+            foreach (var VARIABLE in elements)
+            {
+                Debug.Log(VARIABLE);
+            }
+
         for (int i = 0; i < elements.Count; i++)
         {
-            int num1;
-            int num2;
+            float num1;
+            float num2;
 
             switch (elements[i])
             { 
                 case "+":
-                    num1 = int.Parse(elements[i - 1]);
-                    num2 = int.Parse(elements[i + 1]);
+                    num1 = float.Parse(elements[i - 1]);
+                    num2 = float.Parse(elements[i + 1]);
                     
                     _result = num1 + num2;
                     elements.RemoveRange(i - 1, 3);
@@ -112,8 +114,8 @@ public class Calculator : MonoBehaviour
                     break;
                     
                 case "-":
-                    num1 = int.Parse(elements[elements.IndexOf(elements[i]) - 1]);
-                    num2 = int.Parse(elements[elements.IndexOf(elements[i]) + 1]);
+                    num1 = float.Parse(elements[elements.IndexOf(elements[i]) - 1]);
+                    num2 = float.Parse(elements[elements.IndexOf(elements[i]) + 1]);
 
                     _result = num1 - num2;
                     elements.RemoveRange(i - 1, 3);
@@ -121,7 +123,7 @@ public class Calculator : MonoBehaviour
                     i -= 2;
                     break;
                 default:
-                    //_result = float.Parse(elements[i]);
+                    _result = float.Parse(elements[i]);
                     break;
             }
         }
@@ -131,5 +133,21 @@ public class Calculator : MonoBehaviour
         _dysplayText.text = _result.ToString();
         _result = 0;
 
+    }
+
+    public void ResetNumbers()
+    {
+        _dysplayText.text = "";
+    }
+
+    public void Backspace()
+    {
+        string text = "";
+
+        for (int i = 0; i < _dysplayText.text.Length - 1; i++)
+        {
+            text += _dysplayText.text[i];
+        }
+        _dysplayText.text = text;
     }
 }
